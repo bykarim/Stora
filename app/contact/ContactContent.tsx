@@ -1,13 +1,29 @@
 "use client";
 
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { useState, useEffect, useRef } from "react";
 import { CheckCircle } from "lucide-react";
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
-};
+function useInView(ref: React.RefObject<HTMLElement | null>, threshold = 0.15) {
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setVisible(true); obs.disconnect(); } }, { threshold });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [ref, threshold]);
+  return visible;
+}
+
+function FadeSection({ children, className = "", delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const visible = useInView(ref);
+  return (
+    <div ref={ref} className={className} style={{ opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(30px)", transition: `opacity 0.7s ease ${delay}s, transform 0.7s ease ${delay}s` }}>
+      {children}
+    </div>
+  );
+}
 
 export function ContactContent() {
   const [submitted, setSubmitted] = useState(false);
@@ -26,17 +42,19 @@ export function ContactContent() {
   return (
     <div className="pt-32 pb-20">
       <div className="max-w-5xl mx-auto px-10">
-        <motion.div initial="hidden" animate="visible" variants={{ visible: { transition: { staggerChildren: 0.1 } } }} className="text-center mb-20">
-          <motion.div variants={fadeUp} className="accent-line mx-auto mb-6" />
-          <motion.h1 variants={fadeUp} className="heading-section text-white mb-3">Contact</motion.h1>
-          <motion.p variants={fadeUp} className="text-body text-white/40">
-            Une question, un projet ? Parlons café.
-          </motion.p>
-        </motion.div>
+        <div className="text-center mb-20">
+          <FadeSection><div className="accent-line mx-auto mb-6" /></FadeSection>
+          <FadeSection delay={0.1}><h1 className="heading-section text-white mb-3">Contact</h1></FadeSection>
+          <FadeSection delay={0.2}>
+            <p className="text-body text-white/40">
+              Une question, un projet ? Parlons café.
+            </p>
+          </FadeSection>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-20">
           {/* Info */}
-          <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6 }}>
+          <FadeSection>
             <div className="space-y-8">
               {[
                 { label: "Email", value: "contact@stora-cafe.fr" },
@@ -50,10 +68,10 @@ export function ContactContent() {
                 </div>
               ))}
             </div>
-          </motion.div>
+          </FadeSection>
 
           {/* Form */}
-          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6 }}>
+          <FadeSection delay={0.15}>
             {submitted ? (
               <div className="text-center py-16">
                 <CheckCircle size={40} className="text-[#C8A96E] mx-auto mb-4" />
@@ -72,7 +90,7 @@ export function ContactContent() {
                 </div>
               </form>
             )}
-          </motion.div>
+          </FadeSection>
         </div>
       </div>
     </div>

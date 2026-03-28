@@ -1,14 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
 import { coffees, origins, processes, scoreRanges } from "@/lib/data";
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
-};
+function useInView(ref: React.RefObject<HTMLElement | null>, threshold = 0.15) {
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setVisible(true); obs.disconnect(); } }, { threshold });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [ref, threshold]);
+  return visible;
+}
+
+function FadeSection({ children, className = "", delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const visible = useInView(ref);
+  return (
+    <div ref={ref} className={className} style={{ opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(30px)", transition: `opacity 0.7s ease ${delay}s, transform 0.7s ease ${delay}s` }}>
+      {children}
+    </div>
+  );
+}
 
 export function CatalogueContent() {
   const [selectedOrigins, setSelectedOrigins] = useState<string[]>([]);
@@ -52,13 +68,15 @@ export function CatalogueContent() {
     <div className="pt-32 pb-20">
       <div className="max-w-6xl mx-auto px-10">
         {/* Header */}
-        <motion.div initial="hidden" animate="visible" variants={{ visible: { transition: { staggerChildren: 0.1 } } }} className="text-center mb-16">
-          <motion.div variants={fadeUp} className="accent-line mx-auto mb-6" />
-          <motion.h1 variants={fadeUp} className="heading-section text-white mb-3">Nos cafés verts</motion.h1>
-          <motion.p variants={fadeUp} className="text-body text-white/40 max-w-lg mx-auto">
-            Sélectionnés avec soin auprès des meilleurs producteurs.
-          </motion.p>
-        </motion.div>
+        <div className="text-center mb-16">
+          <FadeSection><div className="accent-line mx-auto mb-6" /></FadeSection>
+          <FadeSection delay={0.1}><h1 className="heading-section text-white mb-3">Nos cafés verts</h1></FadeSection>
+          <FadeSection delay={0.2}>
+            <p className="text-body text-white/40 max-w-lg mx-auto">
+              Sélectionnés avec soin auprès des meilleurs producteurs.
+            </p>
+          </FadeSection>
+        </div>
 
         {/* Filters */}
         <div className="mb-12 space-y-6">
@@ -113,12 +131,8 @@ export function CatalogueContent() {
           {filtered.map((coffee) => {
             const isSelected = selectedCoffees.includes(coffee.id);
             return (
-              <motion.div
+              <FadeSection
                 key={coffee.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.5 }}
                 className={`bg-black p-8 transition-colors duration-300 ${isSelected ? "bg-white/[0.04]" : "hover:bg-white/[0.02]"}`}
               >
                 <div className="flex items-center gap-2 mb-3">
@@ -150,7 +164,7 @@ export function CatalogueContent() {
                     {isSelected ? "✓ Sélectionné" : "Ajouter au devis"}
                   </button>
                 </div>
-              </motion.div>
+              </FadeSection>
             );
           })}
         </div>
@@ -172,23 +186,26 @@ export function CatalogueContent() {
       </div>
 
       {/* Floating button */}
-      <AnimatePresence>
-        {selectedCoffees.length > 0 && (
-          <motion.div
-            initial={{ y: 100, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 100, opacity: 0 }}
-            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50"
+      {selectedCoffees.length > 0 && (
+        <div
+          className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50"
+          style={{ animation: "fadeSlideUp 0.3s ease forwards" }}
+        >
+          <Link
+            href={`/devis?cafes=${encodeURIComponent(selectedNames)}`}
+            className="btn-primary flex items-center gap-3 shadow-2xl shadow-black/50"
           >
-            <Link
-              href={`/devis?cafes=${encodeURIComponent(selectedNames)}`}
-              className="btn-primary flex items-center gap-3 shadow-2xl shadow-black/50"
-            >
-              Demander un devis ({selectedCoffees.length})
-            </Link>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            Demander un devis ({selectedCoffees.length})
+          </Link>
+        </div>
+      )}
+
+      <style jsx>{`
+        @keyframes fadeSlideUp {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
     </div>
   );
 }
