@@ -11,13 +11,25 @@
 :root { --bg: #0a0a0b; --bg-card: #141416; --bg-card-hover: #1c1c20; --border: #2a2a2e; --text: #f0f0f2; --text-secondary: #8a8a96; --accent: #6366f1; --accent-glow: rgba(99,102,241,0.15); --radius: 12px; --radius-sm: 8px; --transition: 0.2s cubic-bezier(0.4,0,0.2,1); }
 html { scroll-behavior: smooth; }
 body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; -webkit-font-smoothing: antialiased; }
-header { padding: 3rem 2rem 2rem; text-align: center; border-bottom: 1px solid var(--border); background: linear-gradient(180deg, #111113 0%, var(--bg) 100%); }
-.header-inner { max-width: 800px; margin: 0 auto; }
-.logo { display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-bottom: 0.75rem; }
-.logo-icon { font-size: 1.75rem; background: linear-gradient(135deg, #6366f1, #a855f7, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-.logo-text { font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; }
-.logo-dot { color: var(--accent); -webkit-text-fill-color: var(--accent); }
-.tagline { color: var(--text-secondary); font-size: 0.95rem; font-weight: 400; }
+header { padding: 0; text-align: center; border-bottom: 1px solid var(--border); background: #07070a; position: relative; overflow: hidden; }
+.hero-bg { position: absolute; inset: 0; overflow: hidden; }
+.hero-bg .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.5; animation: orbFloat 8s ease-in-out infinite; }
+.hero-bg .orb-1 { width: 300px; height: 300px; background: #6366f1; top: -100px; left: -50px; animation-delay: 0s; }
+.hero-bg .orb-2 { width: 250px; height: 250px; background: #ec4899; top: -80px; right: -30px; animation-delay: -3s; }
+.hero-bg .orb-3 { width: 200px; height: 200px; background: #8b5cf6; bottom: -80px; left: 40%; animation-delay: -5s; }
+@keyframes orbFloat { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(20px,-15px) scale(1.1); } }
+.header-inner { max-width: 900px; margin: 0 auto; position: relative; z-index: 1; padding: 3.5rem 2rem 2.5rem; }
+.header-top { display: flex; align-items: center; justify-content: center; gap: 1rem; margin-bottom: 1rem; }
+.logo-mark { width: 48px; height: 48px; border-radius: 14px; background: linear-gradient(135deg, #6366f1, #a855f7, #ec4899); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(99,102,241,0.4); }
+.logo-mark svg { width: 26px; height: 26px; fill: #fff; }
+.logo-text { font-size: 2rem; font-weight: 900; letter-spacing: -0.04em; background: linear-gradient(135deg, #fff 0%, #c7d2fe 50%, #a78bfa 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.logo-dot { -webkit-text-fill-color: #6366f1; }
+.tagline { color: var(--text-secondary); font-size: 0.95rem; font-weight: 400; margin-bottom: 1.25rem; }
+.hero-stats { display: flex; align-items: center; justify-content: center; gap: 2rem; }
+.hero-stat { display: flex; flex-direction: column; align-items: center; }
+.hero-stat-value { font-size: 1.4rem; font-weight: 800; background: linear-gradient(135deg, #6366f1, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.hero-stat-label { font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 500; }
+.hero-divider { width: 1px; height: 30px; background: var(--border); }
 .toolbar { position: sticky; top: 0; z-index: 100; background: rgba(10,10,11,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 1rem 2rem; }
 .toolbar-inner { max-width: 1400px; margin: 0 auto; display: flex; align-items: center; gap: 1rem; }
 .search-box { flex: 1; position: relative; max-width: 500px; }
@@ -65,8 +77,12 @@ footer { text-align: center; padding: 3rem 2rem; color: var(--text-secondary); f
 .empty-state .emoji { font-size: 3rem; margin-bottom: 1rem; display: block; }
 .empty-state p { font-size: 1rem; }
 @media (max-width: 768px) {
-    header { padding: 2rem 1.25rem 1.5rem; }
+    .header-inner { padding: 2.5rem 1.25rem 2rem; }
     .logo-text { font-size: 1.4rem; }
+    .logo-mark { width: 38px; height: 38px; border-radius: 10px; }
+    .logo-mark svg { width: 20px; height: 20px; }
+    .hero-stats { gap: 1.25rem; }
+    .hero-stat-value { font-size: 1.1rem; }
     .tagline { font-size: 0.85rem; }
     .toolbar { padding: 0.75rem 1.25rem; }
     .toolbar-inner { flex-wrap: wrap; }
@@ -90,12 +106,24 @@ footer { text-align: center; padding: 3rem 2rem; color: var(--text-secondary); f
 </head>
 <body>
     <header>
+        <div class="hero-bg">
+            <div class="orb orb-1"></div>
+            <div class="orb orb-2"></div>
+            <div class="orb orb-3"></div>
+        </div>
         <div class="header-inner">
-            <div class="logo">
-                <span class="logo-icon">&#9670;</span>
+            <div class="header-top">
+                <div class="logo-mark"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg></div>
                 <span class="logo-text">Stora<span class="logo-dot">.</span>Colors</span>
             </div>
-            <p class="tagline">R&eacute;f&eacute;rence compl&egrave;te des couleurs &mdash; HEX &middot; RGB &middot; HSL</p>
+            <p class="tagline">La r&eacute;f&eacute;rence pro des couleurs &mdash; HEX &middot; RGB &middot; HSL</p>
+            <div class="hero-stats">
+                <div class="hero-stat"><span class="hero-stat-value" id="colorCount">0</span><span class="hero-stat-label">Couleurs</span></div>
+                <div class="hero-divider"></div>
+                <div class="hero-stat"><span class="hero-stat-value" id="catCount">0</span><span class="hero-stat-label">Cat&eacute;gories</span></div>
+                <div class="hero-divider"></div>
+                <div class="hero-stat"><span class="hero-stat-value">3</span><span class="hero-stat-label">Formats</span></div>
+            </div>
         </div>
     </header>
     <div class="toolbar">
@@ -118,6 +146,13 @@ footer { text-align: center; padding: 3rem 2rem; color: var(--text-secondary); f
 
 <script>
 const COLOR_DATA = [
+  // --- Palettes IA ---
+  {name:"Nebula",hex:"#7C3AED",category:"Palettes IA"},{name:"Aurora",hex:"#06B6D4",category:"Palettes IA"},{name:"Synthwave",hex:"#F472B6",category:"Palettes IA"},{name:"Midnight Code",hex:"#1E1B4B",category:"Palettes IA"},{name:"Electric Violet",hex:"#8B5CF6",category:"Palettes IA"},{name:"Cyber Teal",hex:"#14B8A6",category:"Palettes IA"},{name:"Neon Coral",hex:"#FF6B6B",category:"Palettes IA"},{name:"Glacier Blue",hex:"#38BDF8",category:"Palettes IA"},{name:"Soft Peach",hex:"#FBBF94",category:"Palettes IA"},{name:"Deep Space",hex:"#0F172A",category:"Palettes IA"},{name:"Warm Sand",hex:"#D4A574",category:"Palettes IA"},{name:"Frosted Mint",hex:"#A7F3D0",category:"Palettes IA"},{name:"Sunset Glow",hex:"#FB923C",category:"Palettes IA"},{name:"Lilac Dream",hex:"#C4B5FD",category:"Palettes IA"},{name:"Rose Quartz",hex:"#FDA4AF",category:"Palettes IA"},{name:"Ocean Depth",hex:"#0E7490",category:"Palettes IA"},{name:"Golden Hour",hex:"#F59E0B",category:"Palettes IA"},{name:"Arctic White",hex:"#F1F5F9",category:"Palettes IA"},{name:"Graphite",hex:"#374151",category:"Palettes IA"},{name:"Hologram",hex:"#818CF8",category:"Palettes IA"},
+  // --- Tendances 2025 ---
+  {name:"Mocha Mousse",hex:"#A47864",category:"Tendances 2025"},{name:"Future Dusk",hex:"#846B8A",category:"Tendances 2025"},{name:"Eternal Blue",hex:"#2D5DA1",category:"Tendances 2025"},{name:"Digital Lavender",hex:"#E6E0F3",category:"Tendances 2025"},{name:"Viva Magenta",hex:"#BB2649",category:"Tendances 2025"},{name:"Peach Fuzz",hex:"#FFBE98",category:"Tendances 2025"},{name:"Butter Yellow",hex:"#F3E19C",category:"Tendances 2025"},{name:"Verdant Green",hex:"#3D8B37",category:"Tendances 2025"},{name:"Cherry Red",hex:"#C02B2B",category:"Tendances 2025"},{name:"Powder Blue",hex:"#B0C4DE",category:"Tendances 2025"},{name:"Cinnamon Latte",hex:"#C8956B",category:"Tendances 2025"},{name:"Sage Mist",hex:"#B2BFA8",category:"Tendances 2025"},{name:"Plum Noir",hex:"#3D1C3F",category:"Tendances 2025"},{name:"Coral Clay",hex:"#E07A5F",category:"Tendances 2025"},{name:"Apricot Crush",hex:"#E78B5E",category:"Tendances 2025"},
+  // --- Gradients UI ---
+  {name:"Stripe Blue",hex:"#635BFF",category:"UI & Tech"},{name:"Discord Purple",hex:"#5865F2",category:"UI & Tech"},{name:"Spotify Green",hex:"#1DB954",category:"UI & Tech"},{name:"Figma Red",hex:"#F24E1E",category:"UI & Tech"},{name:"Figma Purple",hex:"#A259FF",category:"UI & Tech"},{name:"Figma Blue",hex:"#1ABCFE",category:"UI & Tech"},{name:"Figma Green",hex:"#0ACF83",category:"UI & Tech"},{name:"Notion Black",hex:"#191919",category:"UI & Tech"},{name:"Linear Blue",hex:"#5E6AD2",category:"UI & Tech"},{name:"Vercel Dark",hex:"#171717",category:"UI & Tech"},{name:"Tailwind Cyan",hex:"#06B6D4",category:"UI & Tech"},{name:"React Blue",hex:"#61DAFB",category:"UI & Tech"},{name:"Vue Green",hex:"#42B883",category:"UI & Tech"},{name:"Svelte Orange",hex:"#FF3E00",category:"UI & Tech"},{name:"GitHub Gray",hex:"#24292E",category:"UI & Tech"},
+  // --- Rouges ---
   {name:"Rouge",hex:"#FF0000",category:"Rouges"},{name:"Cramoisi",hex:"#DC143C",category:"Rouges"},{name:"Rouge Indien",hex:"#CD5C5C",category:"Rouges"},{name:"Saumon Clair",hex:"#FFA07A",category:"Rouges"},{name:"Saumon",hex:"#FA8072",category:"Rouges"},{name:"Saumon Fonc\u00e9",hex:"#E9967A",category:"Rouges"},{name:"Rouge Fonc\u00e9",hex:"#8B0000",category:"Rouges"},{name:"Brique R\u00e9fractaire",hex:"#B22222",category:"Rouges"},{name:"Tomate",hex:"#FF6347",category:"Rouges"},{name:"Corail",hex:"#FF7F50",category:"Rouges"},{name:"Vermillon",hex:"#E34234",category:"Rouges"},{name:"Carmin",hex:"#960018",category:"Rouges"},{name:"Bordeaux",hex:"#6D071A",category:"Rouges"},{name:"Grenat",hex:"#6E0B14",category:"Rouges"},{name:"Cerise",hex:"#DE3163",category:"Rouges"},{name:"Framboise",hex:"#E30B5C",category:"Rouges"},{name:"Coquelicot",hex:"#C60800",category:"Rouges"},{name:"\u00c9carlate",hex:"#FF2400",category:"Rouges"},
   {name:"Rose",hex:"#FFC0CB",category:"Roses"},{name:"Rose Vif",hex:"#FF69B4",category:"Roses"},{name:"Rose Profond",hex:"#FF1493",category:"Roses"},{name:"Rose P\u00e2le",hex:"#FFB6C1",category:"Roses"},{name:"Rose Moyen",hex:"#C71585",category:"Roses"},{name:"Fuchsia",hex:"#FF00FF",category:"Roses"},{name:"Magenta",hex:"#FF0090",category:"Roses"},{name:"Vieux Rose",hex:"#C08081",category:"Roses"},{name:"Rose Bonbon",hex:"#F9429E",category:"Roses"},{name:"Rose Drag\u00e9e",hex:"#FEBFD2",category:"Roses"},{name:"Rose Poudr\u00e9",hex:"#E8CCD7",category:"Roses"},{name:"Rose Th\u00e9",hex:"#FF866A",category:"Roses"},{name:"Rose Fraise",hex:"#EC5E6F",category:"Roses"},
   {name:"Orange",hex:"#FFA500",category:"Oranges"},{name:"Orange Fonc\u00e9",hex:"#FF8C00",category:"Oranges"},{name:"Orange Rouge",hex:"#FF4500",category:"Oranges"},{name:"Mandarine",hex:"#FEA347",category:"Oranges"},{name:"Abricot",hex:"#E67E30",category:"Oranges"},{name:"Citrouille",hex:"#DF6D14",category:"Oranges"},{name:"Carotte",hex:"#F4661B",category:"Oranges"},{name:"Rouille",hex:"#985717",category:"Oranges"},{name:"Terre Cuite",hex:"#CC5500",category:"Oranges"},{name:"Papaye",hex:"#FFEFD5",category:"Oranges"},{name:"P\u00eache",hex:"#FFDAB9",category:"Oranges"},{name:"Ambre",hex:"#F0C300",category:"Oranges"},{name:"Cuivre",hex:"#B87333",category:"Oranges"},
@@ -170,6 +205,8 @@ searchInput.addEventListener('input',renderColors);
 document.addEventListener('click',e=>{const btn=e.target.closest('.cat-btn');if(btn){document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');currentCategory=btn.dataset.category;renderColors()}});
 viewBtns.forEach(btn=>{btn.addEventListener('click',()=>{viewBtns.forEach(b=>b.classList.remove('active'));btn.classList.add('active');currentView=btn.dataset.view;renderColors()})});
 document.addEventListener('keydown',e=>{if(e.key==='/'&&document.activeElement!==searchInput){e.preventDefault();searchInput.focus()}if(e.key==='Escape'&&document.activeElement===searchInput){searchInput.value='';searchInput.blur();renderColors()}});
+document.getElementById('colorCount').textContent=COLOR_DATA.length;
+document.getElementById('catCount').textContent=[...new Set(COLOR_DATA.map(c=>c.category))].length;
 renderColors();
 </script>
 </body>
