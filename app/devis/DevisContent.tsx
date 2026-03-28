@@ -6,15 +6,14 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { motion } from "framer-motion";
-import { Send, CheckCircle, FileText } from "lucide-react";
-import { SectionTitle } from "@/components/ui/SectionTitle";
+import { CheckCircle } from "lucide-react";
 
 const schema = z.object({
-  societe: z.string().min(1, "Le nom de la société est requis"),
-  nom: z.string().min(1, "Le nom est requis"),
-  email: z.string().email("Adresse email invalide"),
+  societe: z.string().min(1, "Requis"),
+  nom: z.string().min(1, "Requis"),
+  email: z.string().email("Email invalide"),
   telephone: z.string().optional(),
-  typeActivite: z.string().min(1, "Veuillez sélectionner un type d'activité"),
+  typeActivite: z.string().min(1, "Requis"),
   cafesSelectionnes: z.string().optional(),
   volumeEstime: z.string().optional(),
   frequence: z.string().optional(),
@@ -23,17 +22,17 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
+const fadeUp = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
+};
+
 function DevisForm() {
   const searchParams = useSearchParams();
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    formState: { errors },
-  } = useForm<FormData>({
+  const { register, handleSubmit, setValue, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
   });
 
@@ -45,64 +44,50 @@ function DevisForm() {
   const onSubmit = async (data: FormData) => {
     setLoading(true);
     try {
-      await fetch("/api/devis", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
+      await fetch("/api/devis", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
       setSubmitted(true);
-    } catch {
-      alert("Erreur lors de l'envoi. Veuillez réessayer.");
-    } finally {
-      setLoading(false);
-    }
+    } catch { alert("Erreur. Veuillez réessayer."); }
+    finally { setLoading(false); }
   };
 
   if (submitted) {
     return (
-      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="max-w-lg mx-auto text-center py-20">
-        <CheckCircle size={64} className="text-[#C8A96E] mx-auto mb-6" />
-        <h2 className="text-2xl font-bold text-[#F0EDE6] font-[family-name:var(--font-serif)] mb-3">Demande envoyée !</h2>
-        <p className="text-[#A8A49C] text-lg">Merci pour votre demande. Nous reviendrons vers vous sous 24h avec un devis personnalisé.</p>
+      <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="text-center py-20">
+        <CheckCircle size={48} className="text-[#C8A96E] mx-auto mb-6" />
+        <h2 className="heading-card text-white mb-3">Demande envoyée</h2>
+        <p className="text-sm text-white/40">Nous reviendrons vers vous sous 24h.</p>
       </motion.div>
     );
   }
 
-  const inputClass = "w-full bg-[#1A1A17] border border-[#2A2A25] rounded-lg px-4 py-3 text-sm text-[#F0EDE6] placeholder:text-[#555] outline-none focus:border-[#C8A96E] transition-colors";
-  const labelClass = "block text-sm font-medium text-[#A8A49C] mb-1.5";
-  const errorClass = "text-xs text-red-400 mt-1";
+  const inputClass = "w-full bg-transparent border-b border-white/10 px-0 py-4 text-sm text-white placeholder:text-white/20 outline-none focus:border-white/40 transition-colors duration-300";
+  const selectClass = "w-full bg-black border-b border-white/10 px-0 py-4 text-sm text-white outline-none focus:border-white/40 transition-colors duration-300";
+  const errorClass = "text-[11px] text-red-400/80 mt-1";
 
   return (
-    <motion.form onSubmit={handleSubmit(onSubmit)} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="max-w-2xl mx-auto space-y-5">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+    <motion.form onSubmit={handleSubmit(onSubmit)} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="max-w-2xl mx-auto space-y-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
         <div>
-          <label className={labelClass}>Société *</label>
-          <input {...register("societe")} className={inputClass} placeholder="Nom de votre entreprise" />
+          <input {...register("societe")} className={inputClass} placeholder="Société *" />
           {errors.societe && <p className={errorClass}>{errors.societe.message}</p>}
         </div>
         <div>
-          <label className={labelClass}>Nom et prénom *</label>
-          <input {...register("nom")} className={inputClass} placeholder="Jean Dupont" />
+          <input {...register("nom")} className={inputClass} placeholder="Nom et prénom *" />
           {errors.nom && <p className={errorClass}>{errors.nom.message}</p>}
         </div>
       </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
         <div>
-          <label className={labelClass}>Email professionnel *</label>
-          <input {...register("email")} type="email" className={inputClass} placeholder="jean@entreprise.fr" />
+          <input {...register("email")} type="email" className={inputClass} placeholder="Email professionnel *" />
           {errors.email && <p className={errorClass}>{errors.email.message}</p>}
         </div>
         <div>
-          <label className={labelClass}>Téléphone</label>
-          <input {...register("telephone")} type="tel" className={inputClass} placeholder="+33 6 12 34 56 78" />
+          <input {...register("telephone")} type="tel" className={inputClass} placeholder="Téléphone" />
         </div>
       </div>
-
       <div>
-        <label className={labelClass}>Type d&apos;activité *</label>
-        <select {...register("typeActivite")} className={inputClass}>
-          <option value="">Sélectionnez...</option>
+        <select {...register("typeActivite")} className={selectClass}>
+          <option value="">Type d&apos;activité *</option>
           <option value="torrefacteur">Torréfacteur artisanal</option>
           <option value="coffeeshop">Coffee shop</option>
           <option value="restaurant">Restaurant / Hôtel</option>
@@ -111,47 +96,37 @@ function DevisForm() {
         </select>
         {errors.typeActivite && <p className={errorClass}>{errors.typeActivite.message}</p>}
       </div>
-
-      <div>
-        <label className={labelClass}>Cafés sélectionnés</label>
-        <textarea {...register("cafesSelectionnes")} rows={2} className={`${inputClass} resize-none`} placeholder="Ex: Yirgacheffe Kochere, Kiambu AA..." />
+      <textarea {...register("cafesSelectionnes")} rows={2} className={`${inputClass} resize-none`} placeholder="Cafés sélectionnés" />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
+        <input {...register("volumeEstime")} className={inputClass} placeholder="Volume estimé (ex: 300kg/mois)" />
+        <select {...register("frequence")} className={selectClass}>
+          <option value="">Fréquence</option>
+          <option value="ponctuel">Ponctuel</option>
+          <option value="mensuel">Mensuel</option>
+          <option value="trimestriel">Trimestriel</option>
+          <option value="autre">Autre</option>
+        </select>
       </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        <div>
-          <label className={labelClass}>Volume estimé</label>
-          <input {...register("volumeEstime")} className={inputClass} placeholder="Ex: 300kg/mois, 1 conteneur/trimestre" />
-        </div>
-        <div>
-          <label className={labelClass}>Fréquence souhaitée</label>
-          <select {...register("frequence")} className={inputClass}>
-            <option value="">Sélectionnez...</option>
-            <option value="ponctuel">Ponctuel</option>
-            <option value="mensuel">Mensuel</option>
-            <option value="trimestriel">Trimestriel</option>
-            <option value="autre">Autre</option>
-          </select>
-        </div>
+      <textarea {...register("message")} rows={3} className={`${inputClass} resize-none`} placeholder="Message / besoins spécifiques" />
+      <div className="pt-8">
+        <button type="submit" disabled={loading} className="btn-primary w-full disabled:opacity-50">
+          {loading ? "Envoi en cours..." : "Envoyer la demande"}
+        </button>
       </div>
-
-      <div>
-        <label className={labelClass}>Message / besoins spécifiques</label>
-        <textarea {...register("message")} rows={4} className={`${inputClass} resize-none`} placeholder="Décrivez vos besoins, contraintes, questions..." />
-      </div>
-
-      <button type="submit" disabled={loading} className="w-full bg-[#C8A96E] text-[#0A0A08] py-3.5 rounded-lg font-semibold hover:bg-[#D4BC8A] transition-colors flex items-center justify-center gap-2 disabled:opacity-50">
-        {loading ? "Envoi en cours..." : <><Send size={16} /> Envoyer la demande de devis</>}
-      </button>
     </motion.form>
   );
 }
 
 export function DevisContent() {
   return (
-    <div className="pt-28 pb-20 px-6">
+    <div className="pt-32 pb-20 px-10">
       <div className="max-w-4xl mx-auto">
-        <SectionTitle tag="Devis" title="Demandez un devis" subtitle="Remplissez le formulaire ci-dessous et recevez un devis personnalisé sous 24h." />
-        <Suspense fallback={<div className="text-center text-[#A8A49C]">Chargement...</div>}>
+        <motion.div initial="hidden" animate="visible" variants={{ visible: { transition: { staggerChildren: 0.1 } } }} className="text-center mb-16">
+          <motion.div variants={fadeUp} className="accent-line mx-auto mb-6" />
+          <motion.h1 variants={fadeUp} className="heading-section text-white mb-3">Demande de devis</motion.h1>
+          <motion.p variants={fadeUp} className="text-body text-white/40">Réponse garantie sous 24h.</motion.p>
+        </motion.div>
+        <Suspense fallback={<div className="text-center text-white/20">Chargement...</div>}>
           <DevisForm />
         </Suspense>
       </div>

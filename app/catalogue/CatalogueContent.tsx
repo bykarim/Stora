@@ -3,10 +3,12 @@
 import { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Filter, X, ShoppingCart } from "lucide-react";
-import { SectionTitle } from "@/components/ui/SectionTitle";
-import { CoffeeCard } from "@/components/ui/CoffeeCard";
 import { coffees, origins, processes, scoreRanges } from "@/lib/data";
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
+};
 
 export function CatalogueContent() {
   const [selectedOrigins, setSelectedOrigins] = useState<string[]>([]);
@@ -14,9 +16,8 @@ export function CatalogueContent() {
   const [selectedScoreRange, setSelectedScoreRange] = useState<string | null>(null);
   const [selectedCoffees, setSelectedCoffees] = useState<string[]>([]);
 
-  const toggleFilter = (arr: string[], setArr: (v: string[]) => void, val: string) => {
-    setArr(arr.includes(val) ? arr.filter((v) => v !== val) : [...arr, val]);
-  };
+  const toggle = (arr: string[], set: (v: string[]) => void, val: string) =>
+    set(arr.includes(val) ? arr.filter((v) => v !== val) : [...arr, val]);
 
   const filtered = coffees.filter((c) => {
     if (selectedOrigins.length && !selectedOrigins.includes(c.origin)) return false;
@@ -28,9 +29,8 @@ export function CatalogueContent() {
     return true;
   });
 
-  const toggleCoffee = (id: string) => {
-    setSelectedCoffees((prev) => prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id]);
-  };
+  const toggleCoffee = (id: string) =>
+    setSelectedCoffees((p) => (p.includes(id) ? p.filter((c) => c !== id) : [...p, id]));
 
   const clearFilters = () => {
     setSelectedOrigins([]);
@@ -39,142 +39,152 @@ export function CatalogueContent() {
   };
 
   const hasFilters = selectedOrigins.length > 0 || selectedProcesses.length > 0 || selectedScoreRange !== null;
+  const selectedNames = selectedCoffees.map((id) => coffees.find((c) => c.id === id)?.name).filter(Boolean).join(", ");
 
-  const selectedCoffeeNames = selectedCoffees
-    .map((id) => coffees.find((c) => c.id === id)?.name)
-    .filter(Boolean)
-    .join(", ");
+  const chipClass = (active: boolean) =>
+    `px-4 py-2 text-xs tracking-wide transition-all duration-200 ${
+      active
+        ? "bg-white text-black"
+        : "bg-transparent text-white/40 border border-white/10 hover:border-white/25"
+    }`;
 
   return (
-    <div className="pt-28 pb-20 px-6">
-      <div className="max-w-6xl mx-auto">
-        <SectionTitle
-          tag="Catalogue"
-          title="Nos cafés verts"
-          subtitle="Explorez notre sélection de cafés verts de spécialité, sourcés directement auprès des producteurs."
-        />
+    <div className="pt-32 pb-20">
+      <div className="max-w-6xl mx-auto px-10">
+        {/* Header */}
+        <motion.div initial="hidden" animate="visible" variants={{ visible: { transition: { staggerChildren: 0.1 } } }} className="text-center mb-16">
+          <motion.div variants={fadeUp} className="accent-line mx-auto mb-6" />
+          <motion.h1 variants={fadeUp} className="heading-section text-white mb-3">Nos cafés verts</motion.h1>
+          <motion.p variants={fadeUp} className="text-body text-white/40 max-w-lg mx-auto">
+            Sélectionnés avec soin auprès des meilleurs producteurs.
+          </motion.p>
+        </motion.div>
 
         {/* Filters */}
-        <div className="mb-10 space-y-4">
-          <div className="flex items-center gap-2 text-sm text-[#A8A49C] mb-3">
-            <Filter size={16} className="text-[#C8A96E]" />
-            <span>Filtrer par</span>
+        <div className="mb-12 space-y-6">
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-white/30 uppercase tracking-widest">Filtres</span>
             {hasFilters && (
-              <button onClick={clearFilters} className="ml-auto flex items-center gap-1 text-[#C8A96E] hover:text-[#D4BC8A]">
-                <X size={14} /> Réinitialiser
+              <button onClick={clearFilters} className="text-xs text-white/30 hover:text-white transition-colors">
+                Réinitialiser
               </button>
             )}
           </div>
 
-          {/* Origin */}
           <div>
-            <span className="text-xs text-[#A8A49C] uppercase tracking-wider mb-2 block">Origine</span>
+            <span className="text-[11px] text-white/20 uppercase tracking-widest block mb-3">Origine</span>
             <div className="flex flex-wrap gap-2">
               {origins.map((o) => (
-                <button
-                  key={o}
-                  onClick={() => toggleFilter(selectedOrigins, setSelectedOrigins, o)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                    selectedOrigins.includes(o)
-                      ? "bg-[#C8A96E] text-[#0A0A08]"
-                      : "bg-[#1A1A17] text-[#A8A49C] border border-[#2A2A25] hover:border-[#C8A96E]/30"
-                  }`}
-                >
+                <button key={o} onClick={() => toggle(selectedOrigins, setSelectedOrigins, o)} className={chipClass(selectedOrigins.includes(o))}>
                   {o}
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Process */}
           <div>
-            <span className="text-xs text-[#A8A49C] uppercase tracking-wider mb-2 block">Process</span>
+            <span className="text-[11px] text-white/20 uppercase tracking-widest block mb-3">Process</span>
             <div className="flex flex-wrap gap-2">
               {processes.map((p) => (
-                <button
-                  key={p}
-                  onClick={() => toggleFilter(selectedProcesses, setSelectedProcesses, p)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                    selectedProcesses.includes(p)
-                      ? "bg-[#C8A96E] text-[#0A0A08]"
-                      : "bg-[#1A1A17] text-[#A8A49C] border border-[#2A2A25] hover:border-[#C8A96E]/30"
-                  }`}
-                >
+                <button key={p} onClick={() => toggle(selectedProcesses, setSelectedProcesses, p)} className={chipClass(selectedProcesses.includes(p))}>
                   {p}
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Score */}
           <div>
-            <span className="text-xs text-[#A8A49C] uppercase tracking-wider mb-2 block">Score SCA</span>
+            <span className="text-[11px] text-white/20 uppercase tracking-widest block mb-3">Score SCA</span>
             <div className="flex flex-wrap gap-2">
               {scoreRanges.map((r) => (
-                <button
-                  key={r.label}
-                  onClick={() => setSelectedScoreRange(selectedScoreRange === r.label ? null : r.label)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                    selectedScoreRange === r.label
-                      ? "bg-[#C8A96E] text-[#0A0A08]"
-                      : "bg-[#1A1A17] text-[#A8A49C] border border-[#2A2A25] hover:border-[#C8A96E]/30"
-                  }`}
-                >
+                <button key={r.label} onClick={() => setSelectedScoreRange(selectedScoreRange === r.label ? null : r.label)} className={chipClass(selectedScoreRange === r.label)}>
                   {r.label}
                 </button>
               ))}
             </div>
           </div>
+
+          <div className="h-px bg-white/5" />
+          <span className="text-xs text-white/20">{filtered.length} résultat{filtered.length > 1 ? "s" : ""}</span>
         </div>
 
-        {/* Results count */}
-        <p className="text-sm text-[#A8A49C] mb-6">{filtered.length} café{filtered.length > 1 ? "s" : ""} trouvé{filtered.length > 1 ? "s" : ""}</p>
-
         {/* Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filtered.map((coffee) => (
-            <CoffeeCard
-              key={coffee.id}
-              coffee={coffee}
-              selected={selectedCoffees.includes(coffee.id)}
-              onToggleSelect={toggleCoffee}
-            />
-          ))}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-white/5">
+          {filtered.map((coffee) => {
+            const isSelected = selectedCoffees.includes(coffee.id);
+            return (
+              <motion.div
+                key={coffee.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 0.5 }}
+                className={`bg-black p-8 transition-colors duration-300 ${isSelected ? "bg-white/[0.04]" : "hover:bg-white/[0.02]"}`}
+              >
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-xl">{coffee.flag}</span>
+                  <span className="text-[11px] text-white/30 uppercase tracking-widest">{coffee.origin}</span>
+                </div>
+                <h3 className="heading-card text-white mb-2">{coffee.name}</h3>
+                <p className="text-sm italic text-[#C8A96E]/70 mb-5">{coffee.notes}</p>
+
+                <div className="grid grid-cols-2 gap-3 text-xs text-white/25 mb-5">
+                  <div><span className="text-white/10 block mb-0.5">Région</span>{coffee.region}</div>
+                  <div><span className="text-white/10 block mb-0.5">Altitude</span>{coffee.altitude}</div>
+                  <div><span className="text-white/10 block mb-0.5">Process</span>{coffee.process}</div>
+                  <div><span className="text-white/10 block mb-0.5">Variétal</span>{coffee.varietal}</div>
+                  <div><span className="text-white/10 block mb-0.5">Récolte</span>{coffee.harvest}</div>
+                  <div><span className="text-white/10 block mb-0.5">Score SCA</span><span className="text-white/60 font-mono">{coffee.score}</span></div>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-white/50 font-medium">{coffee.priceFob}/kg FOB</span>
+                  <button
+                    onClick={() => toggleCoffee(coffee.id)}
+                    className={`text-xs px-4 py-2 transition-all duration-200 ${
+                      isSelected
+                        ? "bg-white text-black"
+                        : "border border-white/10 text-white/40 hover:border-white/25 hover:text-white/60"
+                    }`}
+                  >
+                    {isSelected ? "✓ Sélectionné" : "Ajouter au devis"}
+                  </button>
+                </div>
+              </motion.div>
+            );
+          })}
         </div>
 
         {filtered.length === 0 && (
-          <div className="text-center py-16 text-[#A8A49C]">
-            <p className="text-lg mb-2">Aucun café ne correspond à vos filtres.</p>
-            <button onClick={clearFilters} className="text-[#C8A96E] font-semibold hover:text-[#D4BC8A]">
-              Réinitialiser les filtres
-            </button>
+          <div className="text-center py-20">
+            <p className="text-white/30 mb-4">Aucun café ne correspond à vos filtres.</p>
+            <button onClick={clearFilters} className="text-sm text-white/50 hover:text-white transition-colors">Réinitialiser</button>
           </div>
         )}
 
         {/* Custom sourcing */}
-        <div className="mt-16 text-center p-8 bg-[#1A1A17] border border-[#2A2A25] rounded-xl">
-          <p className="text-[#A8A49C] mb-3">Vous ne trouvez pas ce que vous cherchez ?</p>
-          <Link href="/contact" className="text-[#C8A96E] font-semibold hover:text-[#D4BC8A]">
-            Contactez-nous pour un sourcing sur mesure →
+        <div className="text-center mt-20 py-12 border-t border-b border-white/5">
+          <p className="text-sm text-white/30 mb-2">Vous ne trouvez pas ce que vous cherchez ?</p>
+          <Link href="/contact" className="text-sm text-white/50 hover:text-white transition-colors">
+            Sourcing sur mesure →
           </Link>
         </div>
       </div>
 
-      {/* Floating quote button */}
+      {/* Floating button */}
       <AnimatePresence>
         {selectedCoffees.length > 0 && (
           <motion.div
             initial={{ y: 100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 100, opacity: 0 }}
-            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50"
+            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50"
           >
             <Link
-              href={`/devis?cafes=${encodeURIComponent(selectedCoffeeNames)}`}
-              className="flex items-center gap-3 bg-[#C8A96E] text-[#0A0A08] px-6 py-3.5 rounded-full font-semibold shadow-lg shadow-[#C8A96E]/20 hover:bg-[#D4BC8A] transition-colors"
+              href={`/devis?cafes=${encodeURIComponent(selectedNames)}`}
+              className="btn-primary flex items-center gap-3 shadow-2xl shadow-black/50"
             >
-              <ShoppingCart size={18} />
-              Demander un devis ({selectedCoffees.length} café{selectedCoffees.length > 1 ? "s" : ""})
+              Demander un devis ({selectedCoffees.length})
             </Link>
           </motion.div>
         )}
