@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     template: "%s | Stora",
   },
   description:
-    "Importateur de café vert de spécialité en France. Lots fractionnés dès 30kg, traçabilité complète, sourcing direct auprès des producteurs. Pour torréfacteurs artisanaux.",
+    "Importateur de café vert de spécialité en France. Lots fractionnés dès 30kg, traçabilité complète, sourcing direct auprès des producteurs.",
   openGraph: {
     title: "Stora — Importateur de café vert de spécialité",
     description:
@@ -30,12 +30,11 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
-          href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800;900&display=swap"
+          href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap"
           rel="stylesheet"
         />
       </head>
       <body>
-        <div className="grain-overlay" />
         <Navbar />
         <main>{children}</main>
         <Footer />

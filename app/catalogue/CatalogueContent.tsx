@@ -20,7 +20,7 @@ function FadeSection({ children, className = "", delay = 0 }: { children: React.
   const ref = useRef<HTMLDivElement>(null);
   const visible = useInView(ref);
   return (
-    <div ref={ref} className={className} style={{ opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(30px)", transition: `opacity 0.7s ease ${delay}s, transform 0.7s ease ${delay}s` }}>
+    <div ref={ref} className={className} style={{ opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(25px)", transition: `opacity 0.7s ease ${delay}s, transform 0.7s ease ${delay}s` }}>
       {children}
     </div>
   );
@@ -58,110 +58,117 @@ export function CatalogueContent() {
   const selectedNames = selectedCoffees.map((id) => coffees.find((c) => c.id === id)?.name).filter(Boolean).join(", ");
 
   const chipClass = (active: boolean) =>
-    `px-4 py-2 text-xs tracking-wide transition-all duration-200 ${
+    `px-4 py-2 text-xs tracking-wide rounded-full border transition-all duration-200 cursor-pointer ${
       active
-        ? "bg-white text-black"
-        : "bg-transparent text-white/40 border border-white/10 hover:border-white/25"
+        ? "bg-[#67b99a] text-white border-[#67b99a]"
+        : "bg-white text-[#666] border-[#e5e5e0] hover:border-[#67b99a] hover:text-[#1a1a1a]"
     }`;
 
   return (
-    <div className="pt-32 pb-20">
-      <div className="max-w-6xl mx-auto px-10">
+    <div className="section-light" style={{ marginTop: 106 }}>
+      <div className="max-w-6xl mx-auto px-10 py-20">
         {/* Header */}
         <div className="text-center mb-16">
-          <FadeSection><div className="accent-line mx-auto mb-6" /></FadeSection>
-          <FadeSection delay={0.1}><h1 className="heading-section text-white mb-3">Nos cafés verts</h1></FadeSection>
+          <FadeSection>
+            <p className="text-overline mb-4">Collection</p>
+          </FadeSection>
+          <FadeSection delay={0.1}>
+            <h1 className="heading-section text-[#1a1a1a] mb-3">Nos cafes verts</h1>
+          </FadeSection>
           <FadeSection delay={0.2}>
-            <p className="text-body text-white/40 max-w-lg mx-auto">
-              Sélectionnés avec soin auprès des meilleurs producteurs.
+            <p className="text-body text-[#666] max-w-lg mx-auto">
+              Selectionnes avec soin aupres des meilleurs producteurs.
             </p>
           </FadeSection>
         </div>
 
         {/* Filters */}
-        <div className="mb-12 space-y-6">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-white/30 uppercase tracking-widest">Filtres</span>
-            {hasFilters && (
-              <button onClick={clearFilters} className="text-xs text-white/30 hover:text-white transition-colors">
-                Réinitialiser
-              </button>
-            )}
-          </div>
-
-          <div>
-            <span className="text-[11px] text-white/20 uppercase tracking-widest block mb-3">Origine</span>
-            <div className="flex flex-wrap gap-2">
-              {origins.map((o) => (
-                <button key={o} onClick={() => toggle(selectedOrigins, setSelectedOrigins, o)} className={chipClass(selectedOrigins.includes(o))}>
-                  {o}
+        <FadeSection delay={0.25}>
+          <div className="mb-12 space-y-6 bg-[#f5f5f0] rounded-xl p-8">
+            <div className="flex items-center justify-between">
+              <span className="text-overline">Filtres</span>
+              {hasFilters && (
+                <button onClick={clearFilters} className="text-xs text-[#67b99a] hover:text-[#1a1a1a] transition-colors">
+                  Reinitialiser
                 </button>
-              ))}
+              )}
             </div>
-          </div>
 
-          <div>
-            <span className="text-[11px] text-white/20 uppercase tracking-widest block mb-3">Process</span>
-            <div className="flex flex-wrap gap-2">
-              {processes.map((p) => (
-                <button key={p} onClick={() => toggle(selectedProcesses, setSelectedProcesses, p)} className={chipClass(selectedProcesses.includes(p))}>
-                  {p}
-                </button>
-              ))}
+            <div>
+              <span className="text-xs text-[#999] uppercase tracking-widest block mb-3">Origine</span>
+              <div className="flex flex-wrap gap-2">
+                {origins.map((o) => (
+                  <button key={o} onClick={() => toggle(selectedOrigins, setSelectedOrigins, o)} className={chipClass(selectedOrigins.includes(o))}>
+                    {o}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
 
-          <div>
-            <span className="text-[11px] text-white/20 uppercase tracking-widest block mb-3">Score SCA</span>
-            <div className="flex flex-wrap gap-2">
-              {scoreRanges.map((r) => (
-                <button key={r.label} onClick={() => setSelectedScoreRange(selectedScoreRange === r.label ? null : r.label)} className={chipClass(selectedScoreRange === r.label)}>
-                  {r.label}
-                </button>
-              ))}
+            <div>
+              <span className="text-xs text-[#999] uppercase tracking-widest block mb-3">Process</span>
+              <div className="flex flex-wrap gap-2">
+                {processes.map((p) => (
+                  <button key={p} onClick={() => toggle(selectedProcesses, setSelectedProcesses, p)} className={chipClass(selectedProcesses.includes(p))}>
+                    {p}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
 
-          <div className="h-px bg-white/5" />
-          <span className="text-xs text-white/20">{filtered.length} résultat{filtered.length > 1 ? "s" : ""}</span>
-        </div>
+            <div>
+              <span className="text-xs text-[#999] uppercase tracking-widest block mb-3">Score SCA</span>
+              <div className="flex flex-wrap gap-2">
+                {scoreRanges.map((r) => (
+                  <button key={r.label} onClick={() => setSelectedScoreRange(selectedScoreRange === r.label ? null : r.label)} className={chipClass(selectedScoreRange === r.label)}>
+                    {r.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="h-px bg-[#e5e5e0]" />
+            <span className="text-xs text-[#999]">{filtered.length} resultat{filtered.length > 1 ? "s" : ""}</span>
+          </div>
+        </FadeSection>
 
         {/* Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-white/5">
-          {filtered.map((coffee) => {
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filtered.map((coffee, i) => {
             const isSelected = selectedCoffees.includes(coffee.id);
             return (
               <FadeSection
                 key={coffee.id}
-                className={`bg-black p-8 transition-colors duration-300 ${isSelected ? "bg-white/[0.04]" : "hover:bg-white/[0.02]"}`}
+                delay={i * 0.05}
+                className={`bg-white rounded-xl border border-[#e5e5e0] p-8 transition-all duration-300 card-hover ${isSelected ? "ring-2 ring-[#67b99a]" : ""}`}
               >
                 <div className="flex items-center gap-2 mb-3">
                   <span className="text-xl">{coffee.flag}</span>
-                  <span className="text-[11px] text-white/30 uppercase tracking-widest">{coffee.origin}</span>
+                  <span className="text-overline">{coffee.origin}</span>
                 </div>
-                <h3 className="heading-card text-white mb-2">{coffee.name}</h3>
-                <p className="text-sm italic text-[#C8A96E]/70 mb-5">{coffee.notes}</p>
+                <h3 className="heading-card text-[#1a1a1a] mb-2">{coffee.name}</h3>
+                <p className="text-sm italic text-[#67b99a] mb-5">{coffee.notes}</p>
 
-                <div className="grid grid-cols-2 gap-3 text-xs text-white/25 mb-5">
-                  <div><span className="text-white/10 block mb-0.5">Région</span>{coffee.region}</div>
-                  <div><span className="text-white/10 block mb-0.5">Altitude</span>{coffee.altitude}</div>
-                  <div><span className="text-white/10 block mb-0.5">Process</span>{coffee.process}</div>
-                  <div><span className="text-white/10 block mb-0.5">Variétal</span>{coffee.varietal}</div>
-                  <div><span className="text-white/10 block mb-0.5">Récolte</span>{coffee.harvest}</div>
-                  <div><span className="text-white/10 block mb-0.5">Score SCA</span><span className="text-white/60 font-mono">{coffee.score}</span></div>
+                <div className="grid grid-cols-2 gap-3 text-xs text-[#666] mb-5">
+                  <div><span className="text-[#999] block mb-0.5">Region</span>{coffee.region}</div>
+                  <div><span className="text-[#999] block mb-0.5">Altitude</span>{coffee.altitude}</div>
+                  <div><span className="text-[#999] block mb-0.5">Process</span>{coffee.process}</div>
+                  <div><span className="text-[#999] block mb-0.5">Varietal</span>{coffee.varietal}</div>
+                  <div><span className="text-[#999] block mb-0.5">Recolte</span>{coffee.harvest}</div>
+                  <div><span className="text-[#999] block mb-0.5">Score SCA</span><span className="text-[#1a1a1a] font-mono font-medium">{coffee.score}</span></div>
                 </div>
 
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-white/50 font-medium">{coffee.priceFob}/kg FOB</span>
+                <div className="flex items-center justify-between pt-4 border-t border-[#e5e5e0]">
+                  <span className="text-sm text-[#1a1a1a] font-medium">{coffee.priceFob}/kg FOB</span>
                   <button
                     onClick={() => toggleCoffee(coffee.id)}
-                    className={`text-xs px-4 py-2 transition-all duration-200 ${
+                    className={`text-xs px-4 py-2 rounded-full transition-all duration-200 ${
                       isSelected
-                        ? "bg-white text-black"
-                        : "border border-white/10 text-white/40 hover:border-white/25 hover:text-white/60"
+                        ? "bg-[#67b99a] text-white"
+                        : "border border-[#e5e5e0] text-[#666] hover:border-[#67b99a] hover:text-[#67b99a]"
                     }`}
                   >
-                    {isSelected ? "✓ Sélectionné" : "Ajouter au devis"}
+                    {isSelected ? "✓ Selectionne" : "Ajouter au devis"}
                   </button>
                 </div>
               </FadeSection>
@@ -171,16 +178,16 @@ export function CatalogueContent() {
 
         {filtered.length === 0 && (
           <div className="text-center py-20">
-            <p className="text-white/30 mb-4">Aucun café ne correspond à vos filtres.</p>
-            <button onClick={clearFilters} className="text-sm text-white/50 hover:text-white transition-colors">Réinitialiser</button>
+            <p className="text-[#999] mb-4">Aucun cafe ne correspond a vos filtres.</p>
+            <button onClick={clearFilters} className="text-sm text-[#67b99a] hover:text-[#1a1a1a] transition-colors">Reinitialiser</button>
           </div>
         )}
 
         {/* Custom sourcing */}
-        <div className="text-center mt-20 py-12 border-t border-b border-white/5">
-          <p className="text-sm text-white/30 mb-2">Vous ne trouvez pas ce que vous cherchez ?</p>
-          <Link href="/contact" className="text-sm text-white/50 hover:text-white transition-colors">
-            Sourcing sur mesure →
+        <div className="text-center mt-20 py-12 border-t border-b border-[#e5e5e0]">
+          <p className="text-sm text-[#999] mb-2">Vous ne trouvez pas ce que vous cherchez ?</p>
+          <Link href="/contact" className="discover-link">
+            Sourcing sur mesure
           </Link>
         </div>
       </div>
@@ -193,7 +200,7 @@ export function CatalogueContent() {
         >
           <Link
             href={`/devis?cafes=${encodeURIComponent(selectedNames)}`}
-            className="btn-primary flex items-center gap-3 shadow-2xl shadow-black/50"
+            className="btn-primary flex items-center gap-3 shadow-2xl rounded-full"
           >
             Demander un devis ({selectedCoffees.length})
           </Link>

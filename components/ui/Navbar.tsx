@@ -3,13 +3,18 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { Menu, X, ChevronDown } from "lucide-react";
 
-const links = [
-  { href: "/catalogue", label: "Catalogue" },
-  { href: "/a-propos", label: "À propos" },
-  { href: "/contact", label: "Contact" },
+const navLinks = [
+  {
+    label: "Nos cafés",
+    href: "/catalogue",
+    children: [
+      { href: "/catalogue", label: "Catalogue complet" },
+    ],
+  },
+  { label: "Notre maison", href: "/a-propos" },
+  { label: "Contact", href: "/contact" },
 ];
 
 export function Navbar() {
@@ -18,7 +23,7 @@ export function Navbar() {
   const pathname = usePathname();
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 50);
+    const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -29,101 +34,111 @@ export function Navbar() {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
-          ? "bg-black/90 backdrop-blur-xl"
-          : "bg-transparent"
+          ? "bg-white shadow-sm"
+          : "bg-white"
       }`}
     >
-      <div className="max-w-[1400px] mx-auto px-10 h-16 flex items-center justify-between">
+      {/* Top bar */}
+      <div className="border-b border-[#e5e5e0]">
+        <div className="max-w-[1200px] mx-auto px-6 flex items-center justify-between h-10">
+          <div className="flex items-center gap-4">
+            <span className="text-[11px] text-[#999] tracking-wide">Importateur de café vert de spécialité</span>
+          </div>
+          <div className="hidden md:flex items-center gap-6">
+            <Link href="/contact" className="text-[11px] text-[#999] hover:text-[#1a1a1a] transition-colors tracking-wide">
+              Nous contacter
+            </Link>
+            <Link href="/devis" className="text-[11px] text-[#999] hover:text-[#1a1a1a] transition-colors tracking-wide">
+              Demander un devis
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* Main nav */}
+      <div className="max-w-[1200px] mx-auto px-6 h-16 flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="relative z-10">
-          <span className="text-lg font-medium text-white tracking-tight" style={{ fontFamily: 'var(--font-display)' }}>
+        <Link href="/" className="flex items-center gap-2">
+          <span className="text-2xl font-bold tracking-tight text-[#1a1a1a]" style={{ fontFamily: 'var(--font-display)' }}>
             Stora
           </span>
         </Link>
 
-        {/* Desktop center links */}
-        <div className="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
-          {links.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`text-[13px] font-medium tracking-wide transition-colors duration-200 ${
-                pathname === link.href
-                  ? "text-white"
-                  : "text-white/60 hover:text-white"
-              }`}
-            >
-              {link.label}
-            </Link>
+        {/* Desktop links */}
+        <div className="hidden md:flex items-center gap-8">
+          {navLinks.map((link) => (
+            <div key={link.href} className="relative group">
+              <Link
+                href={link.href}
+                className={`flex items-center gap-1 text-[14px] font-medium tracking-wide transition-colors duration-200 py-5 ${
+                  pathname === link.href || pathname?.startsWith(link.href + "/")
+                    ? "text-[#1a1a1a]"
+                    : "text-[#666] hover:text-[#1a1a1a]"
+                }`}
+              >
+                {link.label}
+                {link.children && <ChevronDown size={14} className="ml-0.5" />}
+              </Link>
+              {link.children && (
+                <div className="absolute top-full left-0 pt-0 hidden group-hover:block">
+                  <div className="bg-white shadow-lg border border-[#e5e5e0] py-2 min-w-[200px]">
+                    {link.children.map((child) => (
+                      <Link
+                        key={child.href}
+                        href={child.href}
+                        className="block px-5 py-2.5 text-[13px] text-[#666] hover:text-[#1a1a1a] hover:bg-[#f5f5f0] transition-colors"
+                      >
+                        {child.label}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           ))}
         </div>
 
         {/* Desktop CTA */}
-        <div className="hidden md:block relative z-10">
-          <Link
-            href="/devis"
-            className="text-[13px] font-medium text-white/60 hover:text-white transition-colors duration-200"
-          >
-            Demander un devis
+        <div className="hidden md:block">
+          <Link href="/devis" className="btn-primary text-[12px] py-2.5 px-5">
+            Devis gratuit
           </Link>
         </div>
 
         {/* Mobile toggle */}
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
-          className="md:hidden text-white p-2 relative z-10"
+          className="md:hidden text-[#1a1a1a] p-2"
         >
-          {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+          {mobileOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
 
-      {/* Mobile menu - full screen overlay */}
-      <AnimatePresence>
-        {mobileOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="fixed inset-0 bg-black z-40 flex flex-col items-center justify-center"
-          >
-            <div className="flex flex-col items-center gap-8">
-              {[{ href: "/", label: "Accueil" }, ...links].map((link, i) => (
-                <motion.div
-                  key={link.href}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.05 }}
-                >
-                  <Link
-                    href={link.href}
-                    className={`text-2xl font-light tracking-tight transition-colors ${
-                      pathname === link.href ? "text-white" : "text-white/50"
-                    }`}
-                    style={{ fontFamily: 'var(--font-display)' }}
-                  >
-                    {link.label}
-                  </Link>
-                </motion.div>
-              ))}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
+      {/* Mobile menu */}
+      {mobileOpen && (
+        <div className="md:hidden bg-white border-t border-[#e5e5e0] absolute left-0 right-0 shadow-lg">
+          <div className="px-6 py-6 space-y-1">
+            {[{ href: "/", label: "Accueil" }, ...navLinks].map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`block py-3 text-[15px] font-medium border-b border-[#e5e5e0] transition-colors ${
+                  pathname === link.href ? "text-[#1a1a1a]" : "text-[#666]"
+                }`}
               >
-                <Link
-                  href="/devis"
-                  className="btn-primary mt-4"
-                >
-                  Demander un devis
-                </Link>
-              </motion.div>
+                {link.label}
+              </Link>
+            ))}
+            <div className="pt-4">
+              <Link href="/devis" className="btn-primary w-full text-center text-[13px]">
+                Demander un devis
+              </Link>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          </div>
+        </div>
+      )}
     </nav>
   );
 }
