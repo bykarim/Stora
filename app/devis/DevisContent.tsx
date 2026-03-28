@@ -41,13 +41,11 @@ function DevisForm() {
     if (cafes) setValue("cafesSelectionnes", cafes);
   }, [searchParams, setValue]);
 
-  const onSubmit = async (data: FormData) => {
+  const onSubmit = async (_data: FormData) => {
     setLoading(true);
-    try {
-      await fetch("/api/devis", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
-      setSubmitted(true);
-    } catch { alert("Erreur. Veuillez réessayer."); }
-    finally { setLoading(false); }
+    await new Promise((r) => setTimeout(r, 1000));
+    setLoading(false);
+    setSubmitted(true);
   };
 
   if (submitted) {
